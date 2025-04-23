@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Market from "./pages/Market";
+import Cartera from "./pages/Cartera";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -25,6 +26,7 @@ const App = () => {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
+          <Route path="/cartera" element={<ProtectedRoute><Cartera /></ProtectedRoute>} />
         </Route>
       </Routes>
     </BrowserRouter>

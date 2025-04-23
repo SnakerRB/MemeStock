@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import HeroSection from "../components/HeroSection";
 import Features from "../components/Features";
 import CallToAction from "../components/CallToAction";
+import Navbar from "../components/Navbar";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard" },
@@ -29,36 +30,11 @@ const DefaultLayout = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-pink-400 tracking-wider">
-            MemeStock
-          </Link>
-          {user && (
-            <nav className="flex space-x-6 text-sm uppercase font-semibold tracking-wide">
-              {navItems.map(({ label, path }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className={`transition hover:text-pink-400 ${
-                    location.pathname === path ? "text-pink-500 underline" : ""
-                  }`}
-                >
-                  {label}
-                </Link>
-              ))}
-              <button
-                onClick={logout}
-                className="text-red-400 hover:text-red-500 transition"
-              >
-                Salir
-              </button>
-            </nav>
-          )}
-        </div>
+        <Navbar />
       </motion.header>
 
       {/* MAIN */}
-      <main className="flex-grow w-full">
+      <main className={`flex-grow w-full ${location.pathname === "/market" ? "" : "max-w-7xl mx-auto px-4 py-10"}`}>
         {isLanding ? (
           <>
             <HeroSection />
@@ -66,9 +42,7 @@ const DefaultLayout = () => {
             <CallToAction />
           </>
         ) : (
-          <div className="px-4 py-10 max-w-7xl mx-auto w-full">
-            <Outlet />
-          </div>
+          <Outlet />
         )}
       </main>
 
