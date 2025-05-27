@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Market from "./pages/Market";
 import Cartera from "./pages/Cartera";
+import MemeDetail from "./pages/MemeDetail";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
           <Route path="/cartera" element={<ProtectedRoute><Cartera /></ProtectedRoute>} />
+          <Route path="/market/:id" element={<ProtectedRoute><MemeDetail /></ProtectedRoute>} />
         </Route>
       </Routes>
     </BrowserRouter>

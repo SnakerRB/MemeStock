@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pandas
+mysql-connector-python
+python-dotenv
+feedparser
+praw
+pytrends
+urllib3>=2.0

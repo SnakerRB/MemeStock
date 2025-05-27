@@ -1,10 +1,20 @@
 import { auth, provider } from "../services/firebase";
 import { signInWithPopup } from "firebase/auth";
+import axios from "axios";
 
 const LoginButton = () => {
   const handleLogin = async () => {
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userData = {
+        id: user.uid,
+        nombre: user.displayName,
+      };
+
+      await axios.post("http://localhost:3000/api/user/newuser", userData);
+
     } catch (error) {
       console.error("Error al iniciar sesión", error);
     }
