@@ -19,6 +19,12 @@ const Navbar = () => {
 
   const handleProfileClick = () => setDropdownOpen((prev) => !prev);
 
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
   return (
     <div className="w-full px-6 py-4 flex justify-between items-center">
       <Link to="/" className="text-2xl font-bold text-pink-400 tracking-wider">
@@ -56,9 +62,10 @@ const Navbar = () => {
               <span className="hidden sm:inline">
                 {user.displayName}
                 <br />
-                <span className="text-xs text-green-400 font-mono">💰 {saldo} coins</span>
+                <span className="text-xs text-green-400 font-mono">
+                  💰 {currencyFormatter.format(saldo)} coins
+                </span>
               </span>
-              
               <ChevronDown size={16} className={`${dropdownOpen ? "rotate-180" : ""} transition`} />
             </button>
 

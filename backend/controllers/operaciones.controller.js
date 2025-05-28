@@ -2,13 +2,13 @@ const operacionesService = require("../services/operaciones.service");
 
 const registrarOperacion = async (req, res) => {
   try {
-    const { tipo, memeId, nombre, precio, userId, timestamp } = req.body;
+    const { tipo, memeId, precio, userId, cantidad } = req.body;
 
-    if (!tipo || !memeId || !nombre || !precio || !userId) {
+    if (!tipo || !memeId || !precio || !userId) {
       return res.status(400).json({ error: "Faltan campos requeridos" });
     }
 
-    await operacionesService.crearOperacion({ tipo, memeId, nombre, precio, userId, timestamp });
+    await operacionesService.crearOperacion({ tipo, memeId, precio, userId, cantidad });
     res.status(201).json({ mensaje: "Operación registrada correctamente" });
   } catch (error) {
     console.error("Error al registrar operación:", error);

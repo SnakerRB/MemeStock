@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getMemeById } from "../services/meme";
 import { useUser } from "../context/UserContext";
-import { registrarOperacion } from "../services/operaciones";
 
 const MemeDetail = () => {
   const { id } = useParams();
@@ -27,7 +26,9 @@ const MemeDetail = () => {
   }, [id]);
 
   const handleCompra = async () => {
-    const exito = comprarMeme(meme, () => registrarOperacion(meme));
+    if (!meme) return;
+
+    const exito = await comprarMeme(meme);
     setMensaje(exito ? `✅ Has comprado ${meme.nombre}` : "❌ Saldo insuficiente");
     setTimeout(() => setMensaje(null), 2000);
   };
@@ -69,13 +70,19 @@ const MemeDetail = () => {
         </div>
         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
           <span className="text-gray-400 block">Cambio 24h</span>
-          <span className={`font-semibold text-xl ${parseFloat(meme.change) >= 0 ? "text-green-400" : "text-red-400"}`}>
+          <span
+            className={`font-semibold text-xl ${
+              parseFloat(meme.change) >= 0 ? "text-green-400" : "text-red-400"
+            }`}
+          >
             {parseFloat(meme.change) >= 0 ? "📈" : "📉"} {parseFloat(meme.change).toFixed(2)}%
           </span>
         </div>
         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
           <span className="text-gray-400 block">Volumen</span>
-          <span className="font-semibold text-xl">${parseInt(meme.volume).toLocaleString()}</span>
+          <span className="font-semibold text-xl">
+            ${parseInt(meme.volume).toLocaleString()}
+          </span>
         </div>
         <div className="flex items-center justify-center">
           <button

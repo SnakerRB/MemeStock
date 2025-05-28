@@ -1,20 +1,20 @@
-const Operacion = require("../models/operacion.model");
+const db = require("../models");
+const Operacion = db.Operacion;
 
-const crearOperacion = async ({ tipo, memeId, nombre, precio, userId, timestamp }) => {
+const crearOperacion = async ({ tipo, memeId, precio, userId, cantidad }) => {
   return await Operacion.create({
     tipo,
     memeId,
-    nombre,
     precio,
     userId,
-    timestamp: timestamp || new Date(),
+    cantidad,
   });
 };
 
 const obtenerOperacionesPorUsuario = async (userId) => {
   return await Operacion.findAll({
     where: { userId },
-    order: [["timestamp", "DESC"]],
+    order: [["createdAt", "DESC"]],
   });
 };
 

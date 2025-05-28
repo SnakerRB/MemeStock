@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Usuario = sequelize.define("Usuario", {
     id: {
-      type: DataTypes.STRING, // ID de Firebase
+      type: DataTypes.STRING,
       primaryKey: true,
     },
     nombre: {
@@ -10,7 +10,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     saldo: {
       type: DataTypes.FLOAT,
-      defaultValue: 1000,
+      defaultValue: 0,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
     },
   });
 

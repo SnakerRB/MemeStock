@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const operacionesController = require('../controllers/operaciones.controller');
+const operacionesController = require("../controllers/operaciones.controller");
 
-router.post('/', operacionesController.registrarOperacion);
-router.get('/:userId', operacionesController.listarOperaciones);
+router.post("/", operacionesController.registrarOperacion);
+router.get("/:userId", operacionesController.listarOperaciones);
 
 module.exports = router;

@@ -1,30 +1,40 @@
 module.exports = (sequelize, DataTypes) => {
-  const Operacion = sequelize.define("Operacion", {
-    tipo: {
-      type: DataTypes.ENUM("compra", "venta"),
-      allowNull: false,
+  const Operacion = sequelize.define(
+    "Operacion",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      memeId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      tipo: {
+        type: DataTypes.ENUM("compra", "venta"),
+        allowNull: false,
+      },
+      precio: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      cantidad: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1,
+      },
     },
-    memeId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    nombre: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    precio: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    userId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    timestamp: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-  });
+    {
+      tableName: "Operaciones",
+      timestamps: true,
+      createdAt: "createdAt",
+      updatedAt: false,
+    }
+  );
 
   return Operacion;
 };

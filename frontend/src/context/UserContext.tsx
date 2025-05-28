@@ -1,53 +1,69 @@
-import React, { createContext, useContext, useState } from "react";
-
-type Meme = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  change: string;
-  volume: string;
-};
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { realizarOperacion } from "../services/operaciones";
+import { getUserData, Meme } from "../services/usuario";
 
 type UserContextType = {
   saldo: number;
   cartera: Meme[];
-  comprarMeme: (meme: Meme, onCompraExitosa?: () => void) => boolean;
-  venderMeme: (memeId: string, onVentaExitosa?: () => void) => boolean;
+  comprarMeme: (meme: { id: string; precio: number }, onCompraExitosa?: () => void) => Promise<boolean>;
+  venderMeme: (meme: { id: string; precio: number }, onVentaExitosa?: () => void) => Promise<boolean>;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
 
 export const useUser = () => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser debe usarse dentro de un UserProvider");
-  }
-  return context;
+  const ctx = useContext(UserContext);
+  if (!ctx) throw new Error("useUser debe usarse dentro de UserProvider");
+  return ctx;
 };
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [saldo, setSaldo] = useState(1000);
+  const [saldo, setSaldo] = useState<number>(0);
   const [cartera, setCartera] = useState<Meme[]>([]);
+  const userId = localStorage.getItem("userId") || "";
 
-  const comprarMeme = (meme: Meme, onCompraExitosa?: () => void): boolean => {
-    if (saldo >= meme.price) {
-      setSaldo((prev) => prev - meme.price);
-      setCartera((prev) => [...prev, meme]);
+  useEffect(() => {
+    if (!userId) return;
+    getUserData(userId)
+      .then((u) => {
+        setSaldo(u.saldo);
+        setCartera(u.cartera);
+      })
+      .catch(console.error);
+  }, [userId]);
+
+  const comprarMeme = async (
+    meme: { id: string; precio: number },
+    onCompraExitosa?: () => void
+  ): Promise<boolean> => {
+    try {
+      await realizarOperacion("compra", meme.id, meme.precio, 1);
+      const u = await getUserData(userId);
+      setSaldo(u.saldo);
+      setCartera(u.cartera);
       onCompraExitosa?.();
       return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return false;
   };
 
-  const venderMeme = (memeId: string, onVentaExitosa?: () => void): boolean => {
-    const meme = cartera.find((m) => m.id === memeId);
-    if (!meme) return false;
-
-    setSaldo((prev) => prev + meme.price);
-    setCartera((prev) => prev.filter((m) => m.id !== memeId));
-    onVentaExitosa?.();
-    return true;
+  const venderMeme = async (
+    meme: { id: string; precio: number },
+    onVentaExitosa?: () => void
+  ): Promise<boolean> => {
+    try {
+      await realizarOperacion("venta", meme.id, meme.precio, 1);
+      const u = await getUserData(userId);
+      setSaldo(u.saldo);
+      setCartera(u.cartera);
+      onVentaExitosa?.();
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   };
 
   return (

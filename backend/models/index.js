@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const dbConfig = require("../config/db.config");
 
+// Crear instancia de Sequelize
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   port: dbConfig.PORT,
@@ -8,25 +9,40 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   logging: false,
   dialectOptions: {
     allowPublicKeyRetrieval: true,
-    ssl: false, 
+    ssl: false,
   },
 });
 
-// Instancia del objeto global de base de datos
+// Objeto para contener todos los modelos
 const db = {};
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 // Cargar modelos
-db.Usuario = require("./usuario.model")(sequelize, DataTypes);
-db.Meme = require("./meme.model")(sequelize, DataTypes);
-db.Operacion = require("./operacion.model")(sequelize, DataTypes);
+db.Usuario = require("./Usuario.model")(sequelize, DataTypes);
+db.Meme = require("./Meme.model")(sequelize, DataTypes);
+db.PrecioMemes = require("./PrecioMemes.model")(sequelize, DataTypes);
+db.Operacion = require("./Operacion.model")(sequelize, DataTypes);
+db.TrendingMeme = require("./TrendingMeme.model")(sequelize, DataTypes);
 
-// Definir relaciones
-db.Usuario.hasMany(db.Operacion, { foreignKey: "userId" });
+// Asociaciones
+db.Usuario.hasMany(db.Operacion, { foreignKey: "userId", onDelete: "CASCADE" });
 db.Operacion.belongsTo(db.Usuario, { foreignKey: "userId" });
 
-db.Meme.hasMany(db.Operacion, { foreignKey: "memeId" });
+db.Meme.hasMany(db.Operacion, { foreignKey: "memeId", onDelete: "CASCADE" });
 db.Operacion.belongsTo(db.Meme, { foreignKey: "memeId" });
+
+db.Meme.hasMany(db.PrecioMemes, { foreignKey: "memeId", onDelete: "CASCADE" });
+db.PrecioMemes.belongsTo(db.Meme, { foreignKey: "memeId" });
+
+db.Meme.hasMany(db.TrendingMeme, { foreignKey: "memeId", onDelete: "CASCADE" });
+db.TrendingMeme.belongsTo(db.Meme, { foreignKey: "memeId" });
+
+// Llamar a associate si existe en cada modelo
+if (db.Meme.associate) db.Meme.associate(db);
+if (db.Usuario.associate) db.Usuario.associate(db);
+if (db.PrecioMemes.associate) db.PrecioMemes.associate(db);
+if (db.Operacion.associate) db.Operacion.associate(db);
+if (db.TrendingMeme.associate) db.TrendingMeme.associate(db);
 
 module.exports = db;

@@ -1,7 +1,6 @@
 import { useUser } from "../context/UserContext";
 import { useEffect, useState } from "react";
 import { getMemes } from "../services/meme";
-import { registrarOperacion } from "../services/operaciones";
 import { useNavigate } from "react-router-dom";
 
 const MemeTable = () => {
@@ -15,8 +14,7 @@ const MemeTable = () => {
     const cargarMemes = async () => {
       try {
         const data = await getMemes();
-        const ordenados = [...data].sort((a, b) => parseFloat(b.change) - parseFloat(a.change));
-        setMemes(ordenados);
+        setMemes(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -29,8 +27,8 @@ const MemeTable = () => {
 
   const handleCompra = async (meme, e) => {
     e.stopPropagation(); // Evita redirección al hacer clic en "Comprar"
-    const exito = comprarMeme(meme, () => registrarOperacion(meme));
-    setMensaje(exito ? `✅ Has comprado ${meme.nombre}` : "❌ Saldo insuficiente");
+    const exito = await comprarMeme(meme);
+    setMensaje(exito ? `✅ Has comprado ${meme.nombre}` : "❌ No se pudo completar la compra");
     setTimeout(() => setMensaje(null), 2000);
   };
 
@@ -38,6 +36,14 @@ const MemeTable = () => {
     style: "currency",
     currency: "USD",
   });
+
+  const dateFormatter = (fecha) => {
+    return new Date(fecha).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   if (loading) return <p className="text-gray-400">Cargando memes...</p>;
 
@@ -54,64 +60,47 @@ const MemeTable = () => {
             <tr>
               <th className="px-4 py-3">Meme</th>
               <th className="px-4 py-3">Precio</th>
-              <th className="px-4 py-3">Cambio 24h</th>
-              <th className="px-4 py-3">Volumen</th>
+              <th className="px-4 py-3">Última actualización</th>
+              <th className="px-4 py-3">Rareza</th>
               <th className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {memes.map((meme, index) => {
-              const changeNum = parseFloat(meme.change);
-              const formattedChange = isNaN(changeNum) ? "--" : `${changeNum.toFixed(2)}%`;
-              const isPositive = changeNum > 0;
-
-              return (
-                <tr
-                  key={meme.id}
-                  onClick={() => navigate(`/market/${meme.id}`)}
-                  className={`cursor-pointer border-t border-white/10 hover:bg-white/10 transition ${
-                    index % 2 === 0 ? "bg-white/5" : "bg-transparent"
-                  }`}
-                >
-                  <td className="px-4 py-3 flex items-center gap-3">
-                    <img
-                      src={meme.imagen || "/placeholder.png"}
-                      alt={meme.nombre}
-                      className="w-10 h-10 rounded-full object-cover bg-white/10"
-                    />
-                    <span className="font-medium">{meme.nombre}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {meme.precio ? currencyFormatter.format(meme.precio) : "--"}
-                  </td>
-                  <td
-                    className={`px-4 py-3 font-semibold flex items-center gap-1 ${
-                      isNaN(changeNum)
-                        ? "text-gray-400"
-                        : isPositive
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }`}
+            {memes.map((meme, index) => (
+              <tr
+                key={meme.id}
+                onClick={() => navigate(`/market/${meme.id}`)}
+                className={`cursor-pointer border-t border-white/10 hover:bg-white/10 transition ${
+                  index % 2 === 0 ? "bg-white/5" : "bg-transparent"
+                }`}
+              >
+                <td className="px-4 py-3 flex items-center gap-3">
+                  <img
+                    src={meme.imagen || "/placeholder.png"}
+                    alt={meme.nombre}
+                    className="w-10 h-10 rounded-full object-cover bg-white/10"
+                  />
+                  <span className="font-medium">{meme.nombre}</span>
+                </td>
+                <td className="px-4 py-3">
+                  {meme.precio != null ? currencyFormatter.format(meme.precio) : "--"}
+                </td>
+                <td className="px-4 py-3 text-xs text-gray-300">
+                  {meme.precioTimestamp
+                    ? dateFormatter(meme.precioTimestamp)
+                    : "Sin datos"}
+                </td>
+                <td className="px-4 py-3 capitalize text-pink-300">{meme.rareza}</td>
+                <td className="px-4 py-3">
+                  <button
+                    onClick={(e) => handleCompra(meme, e)}
+                    className="bg-pink-500 hover:bg-pink-600 px-4 py-1 text-xs rounded-md font-bold transition"
                   >
-                    {!isNaN(changeNum) && (
-                      <span>{isPositive ? "📈" : "📉"}</span>
-                    )}
-                    {formattedChange}
-                  </td>
-                  <td className="px-4 py-3">
-                    {meme.volume ? `$${parseInt(meme.volume).toLocaleString()}` : "--"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={(e) => handleCompra(meme, e)}
-                      className="bg-pink-500 hover:bg-pink-600 px-4 py-1 text-xs rounded-md font-bold transition"
-                    >
-                      Comprar
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                    Comprar
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

@@ -5,29 +5,44 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 // Creamos el contexto
 const AuthContext = createContext();
 
-// Hook personalizado para usar el contexto
-export const useAuth = () => useContext(AuthContext);
+// Hook personalizado para consumir el contexto
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth debe usarse dentro de un AuthProvider");
+  }
+  return context;
+};
 
 // Proveedor del contexto
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Listener de Firebase Auth
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
+
+      // Guardar userId en localStorage
+      if (firebaseUser?.uid) {
+        localStorage.setItem("userId", firebaseUser.uid);
+      } else {
+        localStorage.removeItem("userId");
+      }
     });
-    return unsubscribe;
+
+    return () => unsubscribe();
   }, []);
 
-  // Función para cerrar sesión
-  const logout = () => signOut(auth);
+  const logout = async () => {
+    await signOut(auth);
+    setUser(null);
+    localStorage.removeItem("userId");
+  };
 
-  // Proveedor del contexto
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider value={{ user, setUser, logout, loading }}>
       {!loading ? children : null}
     </AuthContext.Provider>
   );

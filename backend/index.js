@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const db = require("./models"); // Sequelize y modelos
 const operacionesRoutes = require('./routes/operaciones.routes'); 
-const pingRoutes = require("./routes/operaciones.routes");
+const pingRoutes = require("./routes/ping.routes");
 const userRoutes = require("./routes/usuario.routes");
 const memeRoutes = require("./routes/meme.routes");
 

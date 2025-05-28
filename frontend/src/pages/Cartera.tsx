@@ -1,13 +1,12 @@
 import { useUser } from "../context/UserContext";
 import React, { useState } from "react";
-import { registrarOperacion } from "../services/operaciones";
 
 const Cartera = () => {
   const { cartera, venderMeme } = useUser();
   const [mensaje, setMensaje] = useState<string | null>(null);
 
   const handleVenta = async (meme) => {
-    const exito = venderMeme(meme.id, () => registrarOperacion(meme, "venta"));
+    const exito = await venderMeme(meme);
     setMensaje(exito ? `✅ Has vendido ${meme.name}` : "❌ No puedes vender este meme");
     setTimeout(() => setMensaje(null), 2000);
   };

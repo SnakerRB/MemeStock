@@ -8,23 +8,35 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    precio: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
     imagen: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
-    change: {
+    categoria: {
       type: DataTypes.STRING,
-      allowNull: true,
     },
-    volume: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    rareza: {
+      type: DataTypes.ENUM("popular", "raro", "nuevo"),
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  }, {
+    tableName: "Memes",
   });
+
+  // Asociaciones
+  Meme.associate = (models) => {
+    Meme.hasMany(models.PrecioMemes, {
+      foreignKey: "memeId",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+  };
 
   return Meme;
 };
