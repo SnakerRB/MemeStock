@@ -33,17 +33,15 @@ services:
   scraper:
     build: ./scraper
     container_name: memestock-scraper
-    ports:
-      - "8000:8000"
     volumes:
       - ./scraper:/usr/src/app
     working_dir: /usr/src/app
     env_file:
       - ./scraper/.env
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - mariadb
     restart: unless-stopped
+    command: python scraper_falseo.py 
 
 volumes:
   mariadb_data:

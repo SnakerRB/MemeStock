@@ -21,8 +21,8 @@ CREATE TABLE Memes (
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabla Precios_Memes
-CREATE TABLE Precios_Memes (
+-- Tabla PrecioMemes
+CREATE TABLE PrecioMemes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     memeId VARCHAR(255),
     precio FLOAT NOT NULL,
