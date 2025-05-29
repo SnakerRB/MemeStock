@@ -37,34 +37,47 @@ exports.getUserData = async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    // Obtenemos las operaciones de compra del usuario
     const operaciones = await Operacion.findAll({
-      where: { userId, tipo: "compra" },
+      where: { userId },
       include: [{ model: Meme }],
+      order: [["createdAt", "ASC"]], // importante para conservar el orden de compra/venta
     });
 
-    // Agrupamos por meme para acumular cantidades
     const carteraMap = new Map();
 
     for (const op of operaciones) {
       const meme = op.Meme;
-      if (!meme) continue; // Si por alguna razón el meme no existe
+      if (!meme) continue;
 
       const key = meme.id;
       const existente = carteraMap.get(key);
 
-      if (existente) {
-        existente.cantidad += op.cantidad || 1;
-      } else {
+      if (!existente) {
         carteraMap.set(key, {
           id: meme.id,
-          name: meme.nombre,
-          image: meme.imagen,
-          price: op.precio, // último precio de compra
-          change: meme.change || "0", // opcional: solo si existe
-          volume: meme.volume || "0", // opcional: solo si existe
-          cantidad: op.cantidad || 1,
+          nombre: meme.nombre,
+          imagen: meme.imagen,
+          categoria: meme.categoria,
+          rareza: meme.rareza,
+          cantidad: 0,
+          precioCompra: 0,
+          fechaCompra: null,
         });
+      }
+
+      const actual = carteraMap.get(key);
+
+      if (op.tipo === "compra") {
+        actual.cantidad += op.cantidad;
+        actual.precioCompra = op.precio;
+        actual.fechaCompra = op.createdAt;
+      } else if (op.tipo === "venta") {
+        actual.cantidad -= op.cantidad;
+      }
+
+      // Si el usuario vendió todos los que tenía, eliminamos el meme de la cartera
+      if (actual.cantidad <= 0) {
+        carteraMap.delete(key);
       }
     }
 
@@ -74,7 +87,6 @@ exports.getUserData = async (req, res) => {
       saldo: usuario.saldo,
       cartera,
     });
-
   } catch (error) {
     console.error("Error al obtener datos del usuario:", error);
     res.status(500).json({ error: "Error del servidor" });

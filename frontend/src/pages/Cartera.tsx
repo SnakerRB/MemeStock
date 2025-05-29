@@ -5,11 +5,25 @@ const Cartera = () => {
   const { cartera, venderMeme } = useUser();
   const [mensaje, setMensaje] = useState<string | null>(null);
 
-  const handleVenta = async (meme) => {
-    const exito = await venderMeme(meme);
-    setMensaje(exito ? `✅ Has vendido ${meme.name}` : "❌ No puedes vender este meme");
+  const handleVenta = async (meme: {
+    id: string;
+    precioCompra: number;
+    nombre: string;
+  }) => {
+    const exito = await venderMeme(
+      { id: meme.id, precio: meme.precioCompra },
+      () => {
+        setMensaje(`✅ Has vendido ${meme.nombre}`);
+      }
+    );
+    if (!exito) setMensaje("❌ No puedes vender este meme");
     setTimeout(() => setMensaje(null), 2000);
   };
+
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
 
   return (
     <div className="p-6">
@@ -31,13 +45,20 @@ const Cartera = () => {
               className="border rounded-xl p-4 bg-white/5 text-white backdrop-blur shadow-md flex flex-col"
             >
               <img
-                src={meme.image}
-                alt={meme.name}
+                src={meme.imagen || "/placeholder.png"}
+                alt={meme.nombre}
                 className="w-full h-40 object-cover rounded mb-2"
               />
-              <h3 className="text-lg font-bold">{meme.name}</h3>
-              <p className="text-sm text-white/70">💰 {meme.price} coins</p>
-              <p className="text-xs text-pink-300 mb-4">{meme.change}</p>
+              <h3 className="text-lg font-bold">{meme.nombre}</h3>
+              <p className="text-sm text-white/70">🎯 Rareza: {meme.rareza}</p>
+              <p className="text-sm">📦 Cantidad: {meme.cantidad}</p>
+              <p className="text-sm">
+                💸 Precio Compra: {currencyFormatter.format(meme.precioCompra)}
+              </p>
+              <p className="text-xs text-white/50 italic">
+                Fecha de compra: {new Date(meme.fechaCompra).toLocaleDateString()}
+              </p>
+
               <button
                 onClick={() => handleVenta(meme)}
                 className="mt-auto bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded transition"
