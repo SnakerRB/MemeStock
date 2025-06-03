@@ -13,3 +13,11 @@ export const getMemeById = async (memeId) => {
   }
   return res.json();
 };
+
+export const getMemesSummary = async () => {
+  const res = await fetch("http://localhost:3000/api/meme/GetMemesSummary");
+  if (!res.ok) {
+    throw new Error("Error al obtener el resumen de memes");
+  }
+  return res.json();
+};

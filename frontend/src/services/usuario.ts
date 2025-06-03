@@ -7,6 +7,7 @@ export type Meme = {
   cantidad: number;
   precioCompra: number;         // Precio en el momento de la compra
   fechaCompra: string;          // Timestamp de la operación
+  precioActual?: number; 
 };
 
 export const getUserData = async (userId: string): Promise<{
