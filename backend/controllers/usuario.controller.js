@@ -1,20 +1,29 @@
 const { Usuario, Operacion, Meme } = require("../models");
+const { downloadAvatar } = require("../utils/avatarDownloader"); // 👈 Importar el util
 
 exports.createOrFindUser = async (req, res) => {
-  const { id, nombre, avatar } = req.body;  // 👈 Añadir avatar en el request
+  const { id, nombre, avatar } = req.body;
 
   if (!id || !nombre) {
     return res.status(400).json({ error: "Faltan datos obligatorios: id o nombre" });
   }
 
   try {
+    let avatarLocalPath = null;
+
+    if (avatar) {
+      // Descargar avatar usando el util
+      avatarLocalPath = await downloadAvatar(avatar, `${id}.jpg`);
+    }
+
     const [usuario, creado] = await Usuario.findOrCreate({
       where: { id },
-      defaults: { nombre, avatar }  // 👈 Guardar avatar en caso de creación
+      defaults: { nombre, avatar: avatarLocalPath }
     });
 
-    if (!creado && !usuario.avatar && avatar) {
-      usuario.avatar = avatar;
+    // Si ya existía pero no tenía avatar, actualizamos
+    if (!creado && !usuario.avatar && avatarLocalPath) {
+      usuario.avatar = avatarLocalPath;
       await usuario.save();
     }
 
@@ -24,7 +33,7 @@ exports.createOrFindUser = async (req, res) => {
         id: usuario.id,
         nombre: usuario.nombre,
         saldo: usuario.saldo,
-        avatar: usuario.avatar,    
+        avatar: usuario.avatar,
       },
     });
 
@@ -33,7 +42,6 @@ exports.createOrFindUser = async (req, res) => {
     res.status(500).json({ error: "Error del servidor" });
   }
 };
-
 
 exports.getUserData = async (req, res) => {
   const { userId } = req.params;
@@ -47,7 +55,7 @@ exports.getUserData = async (req, res) => {
     const operaciones = await Operacion.findAll({
       where: { userId },
       include: [{ model: Meme }],
-      order: [["createdAt", "ASC"]], // importante para conservar el orden de compra/venta
+      order: [["createdAt", "ASC"]],
     });
 
     const carteraMap = new Map();
@@ -82,7 +90,6 @@ exports.getUserData = async (req, res) => {
         actual.cantidad -= op.cantidad;
       }
 
-      // Si el usuario vendió todos los que tenía, eliminamos el meme de la cartera
       if (actual.cantidad <= 0) {
         carteraMap.delete(key);
       }
@@ -90,10 +97,9 @@ exports.getUserData = async (req, res) => {
 
     const cartera = Array.from(carteraMap.values());
 
-    // Ahora devolvemos saldo + avatar + cartera
     res.json({
       saldo: usuario.saldo,
-      avatar: usuario.avatar,  // 👈 nuevo campo avatar
+      avatar: usuario.avatar,
       cartera,
     });
   } catch (error) {

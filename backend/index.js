@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // 👈 Necesario para servir archivos
 require('dotenv').config();
 
 const db = require("./models"); // Sequelize y modelos
@@ -13,6 +14,9 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// 👉 Servir imágenes de avatars (cacheadas)
+app.use('/avatars', express.static(path.join(__dirname, 'public', 'avatars')));
 
 // Ruta de prueba
 app.get('/', (req, res) => {

@@ -28,6 +28,8 @@ const Ranking = () => {
     return `${index + 1}º`;
   };
 
+  const API_BASE_URL = "http://localhost:3000";
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold text-pink-400 mb-10 flex items-center gap-3 justify-center">
@@ -48,8 +50,9 @@ const Ranking = () => {
               <div className="flex items-center gap-4">
                 <span className="text-2xl font-bold text-pink-400">{getMedal(index)}</span>
                 <img
-                  src={user.avatar || "/default-avatar.png"}
+                  src={user.avatar ? `${API_BASE_URL}${user.avatar}` : "/default-avatar.png"}
                   alt={user.nombre}
+                  loading="lazy"
                   className="w-14 h-14 rounded-full border border-white/20 object-cover"
                 />
                 <span className="text-lg font-semibold text-white">{user.nombre}</span>
