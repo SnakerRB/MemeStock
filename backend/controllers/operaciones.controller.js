@@ -1,4 +1,5 @@
 const operacionesService = require("../services/operaciones.service");
+const db = require("../models"); 
 
 const registrarOperacion = async (req, res) => {
   try {
@@ -27,7 +28,55 @@ const listarOperaciones = async (req, res) => {
   }
 };
 
+const rankingInversores = async (req, res) => {
+  try {
+    const usuarios = await db.Usuario.findAll({
+      attributes: ["id", "nombre", "avatar"], // 👈 Incluimos el avatar aquí
+      include: [
+        {
+          model: db.Operacion,
+          as: "operaciones",
+          attributes: ["tipo", "precio", "cantidad"],
+        },
+      ],
+    });
+
+    const ranking = usuarios.map((usuario) => {
+      let totalCompras = 0;
+      let totalVentas = 0;
+
+      usuario.operaciones.forEach((op) => {
+        if (op.tipo === "compra") {
+          totalCompras += op.precio * op.cantidad;
+        } else if (op.tipo === "venta") {
+          totalVentas += op.precio * op.cantidad;
+        }
+      });
+
+      const ganancias = totalVentas - totalCompras;
+      const rentabilidad = totalCompras > 0 ? (ganancias / totalCompras) * 100 : 0;
+
+      return {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        avatar: usuario.avatar, // 👈 Devolvemos el avatar
+        rentabilidad: parseFloat(rentabilidad.toFixed(2)),
+      };
+    });
+
+    // Ordenar por rentabilidad descendente
+    ranking.sort((a, b) => b.rentabilidad - a.rentabilidad);
+
+    res.json(ranking);
+  } catch (error) {
+    console.error("Error al generar ranking:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+
 module.exports = {
   registrarOperacion,
   listarOperaciones,
+  rankingInversores,
 };

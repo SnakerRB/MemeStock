@@ -1,7 +1,7 @@
 const { Usuario, Operacion, Meme } = require("../models");
 
 exports.createOrFindUser = async (req, res) => {
-  const { id, nombre } = req.body;
+  const { id, nombre, avatar } = req.body;  // 👈 Añadir avatar en el request
 
   if (!id || !nombre) {
     return res.status(400).json({ error: "Faltan datos obligatorios: id o nombre" });
@@ -10,8 +10,13 @@ exports.createOrFindUser = async (req, res) => {
   try {
     const [usuario, creado] = await Usuario.findOrCreate({
       where: { id },
-      defaults: { nombre }
+      defaults: { nombre, avatar }  // 👈 Guardar avatar en caso de creación
     });
+
+    if (!creado && !usuario.avatar && avatar) {
+      usuario.avatar = avatar;
+      await usuario.save();
+    }
 
     res.status(200).json({
       message: creado ? "Usuario creado" : "Usuario ya existía",
@@ -19,6 +24,7 @@ exports.createOrFindUser = async (req, res) => {
         id: usuario.id,
         nombre: usuario.nombre,
         saldo: usuario.saldo,
+        avatar: usuario.avatar,    
       },
     });
 
@@ -27,6 +33,7 @@ exports.createOrFindUser = async (req, res) => {
     res.status(500).json({ error: "Error del servidor" });
   }
 };
+
 
 exports.getUserData = async (req, res) => {
   const { userId } = req.params;
@@ -83,8 +90,10 @@ exports.getUserData = async (req, res) => {
 
     const cartera = Array.from(carteraMap.values());
 
+    // Ahora devolvemos saldo + avatar + cartera
     res.json({
       saldo: usuario.saldo,
+      avatar: usuario.avatar,  // 👈 nuevo campo avatar
       cartera,
     });
   } catch (error) {

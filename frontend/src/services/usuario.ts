@@ -10,10 +10,13 @@ export type Meme = {
   precioActual?: number; 
 };
 
-export const getUserData = async (userId: string): Promise<{
+export type UserData = {
   saldo: number;
   cartera: Meme[];
-}> => {
+  avatar: string;         
+};
+
+export const getUserData = async (userId: string): Promise<UserData> => {
   const res = await fetch(`http://localhost:3000/api/user/${userId}`);
   if (!res.ok) throw new Error("Error al obtener datos de usuario");
   return await res.json();

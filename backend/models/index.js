@@ -26,8 +26,8 @@ db.Operacion = require("./Operacion.model")(sequelize, DataTypes);
 db.TrendingMeme = require("./TrendingMeme.model")(sequelize, DataTypes);
 
 // Asociaciones
-db.Usuario.hasMany(db.Operacion, { foreignKey: "userId", onDelete: "CASCADE" });
-db.Operacion.belongsTo(db.Usuario, { foreignKey: "userId" });
+db.Usuario.hasMany(db.Operacion, { foreignKey: "userId", onDelete: "CASCADE", as: "operaciones" });
+db.Operacion.belongsTo(db.Usuario, { foreignKey: "userId", as: "usuario" });
 
 db.Meme.hasMany(db.Operacion, { foreignKey: "memeId", onDelete: "CASCADE" });
 db.Operacion.belongsTo(db.Meme, { foreignKey: "memeId" });

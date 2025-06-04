@@ -8,6 +8,7 @@ import LogoutButton from "./LogoutButton";
 const navItems = [
   { label: "📊 Dashboard", path: "/dashboard" },
   { label: "💰 Market", path: "/market" },
+  { label: "🏆 Ranking", path: "/ranking" },
 ];
 
 const Navbar = () => {

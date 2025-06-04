@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import Market from "./pages/Market";
 import Cartera from "./pages/Cartera";
 import MemeDetail from "./pages/MemeDetail";
+import Ranking from "./pages/Ranking";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -25,6 +26,7 @@ const App = () => {
           <Route index element={<Navigate to={user ? "/dashboard" : "/login"} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
           <Route path="/cartera" element={<ProtectedRoute><Cartera /></ProtectedRoute>} />

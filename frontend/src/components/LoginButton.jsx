@@ -11,12 +11,14 @@ const LoginButton = () => {
       const userData = {
         id: user.uid,
         nombre: user.displayName,
+        avatar: user.photoURL, // 👈 Añadimos el avatar aquí
       };
 
+      // Llamada al backend para crear o actualizar el usuario
       await axios.post("http://localhost:3000/api/user/newuser", userData);
 
     } catch (error) {
-      console.error("Error al iniciar sesión", error);
+      console.error("Error al iniciar sesión:", error);
     }
   };
 
