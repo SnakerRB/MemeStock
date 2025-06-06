@@ -17,7 +17,7 @@ export type UserData = {
 };
 
 export const getUserData = async (userId: string): Promise<UserData> => {
-  const res = await fetch(`http://localhost:3000/api/user/${userId}`);
+  const res = await fetch(`http://tfc.snakernet.net:3000/api/user/${userId}`);
   if (!res.ok) throw new Error("Error al obtener datos de usuario");
   return await res.json();
 };

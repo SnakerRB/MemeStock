@@ -74,9 +74,46 @@ const rankingInversores = async (req, res) => {
   }
 };
 
+const obtenerMemesComprados = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const memes = await operacionesService.obtenerMemesCompradosPorUsuario(userId);
+
+    res.json(memes);
+  } catch (error) {
+    console.error("Error al obtener memes comprados:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+const obtenerHistorialOperaciones = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const operaciones = await operacionesService.obtenerHistorialOperacionesPorUsuario(userId);
+
+    // Mapear el formato para el front
+    const historial = operaciones.map((op) => ({
+      id: op.id,
+      tipo: op.tipo,
+      precio: op.precio,
+      cantidad: op.cantidad,
+      memeId: op.memeId,
+      memeNombre: op.meme.nombre,
+      createdAt: op.createdAt,
+    }));
+
+    res.json(historial);
+  } catch (error) {
+    console.error("Error al obtener historial de transacciones:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
 
 module.exports = {
   registrarOperacion,
   listarOperaciones,
   rankingInversores,
+  obtenerMemesComprados,
+  obtenerHistorialOperaciones,
 };

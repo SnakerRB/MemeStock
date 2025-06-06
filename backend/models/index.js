@@ -30,7 +30,7 @@ db.Usuario.hasMany(db.Operacion, { foreignKey: "userId", onDelete: "CASCADE", as
 db.Operacion.belongsTo(db.Usuario, { foreignKey: "userId", as: "usuario" });
 
 db.Meme.hasMany(db.Operacion, { foreignKey: "memeId", onDelete: "CASCADE" });
-db.Operacion.belongsTo(db.Meme, { foreignKey: "memeId" });
+db.Operacion.belongsTo(db.Meme, { foreignKey: "memeId", as: "meme"});
 
 db.Meme.hasMany(db.PrecioMemes, { foreignKey: "memeId", onDelete: "CASCADE" });
 db.PrecioMemes.belongsTo(db.Meme, { foreignKey: "memeId" });

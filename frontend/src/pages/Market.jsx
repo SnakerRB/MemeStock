@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import MemeTable from "../components/MemeTable"; // Importa el nuevo componente
+import MemeTable from "../components/MemeTable";
+import MemeAlza from "../components/MemeAlza";
+import MemeBaja from "../components/MemeBaja";
+import MemeTopDia from "../components/MemeTopDia";
 
 const sidebarOptions = [
   "Resumen",
@@ -45,6 +48,12 @@ const Market = () => {
 
         {activeOption === "Resumen" ? (
           <MemeTable />
+        ) : activeOption === "Memes en Alza" ? (
+          <MemeAlza />
+        ) : activeOption === "Memes en Baja" ? (
+          <MemeBaja />
+        ) : activeOption === "Ranking del Día" ? (
+          <MemeTopDia />
         ) : (
           <div className="text-gray-400 italic text-sm">
             Contenido próximamente...

@@ -36,7 +36,43 @@ const obtenerOperacionesPorUsuario = async (userId) => {
   });
 };
 
+const obtenerMemesCompradosPorUsuario = async (userId) => {
+  const operaciones = await db.Operacion.findAll({
+    where: {
+      userId,
+      tipo: "compra",
+    },
+    attributes: ["memeId"],
+    group: ["memeId"], // 👈 Evita repetidos
+    include: [
+      {
+        model: db.Meme, // 👈 Asegúrate de que tienes la relación creada
+        as: "meme",
+        attributes: ["id", "nombre", "imagen"],
+      },
+    ],
+  });
+
+  return operaciones.map((op) => op.meme);
+};
+
+const obtenerHistorialOperacionesPorUsuario = async (userId) => {
+  return await db.Operacion.findAll({
+    where: { userId },
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: db.Meme,
+        as: "meme",
+        attributes: ["id", "nombre"],
+      },
+    ],
+  });
+};
+
 module.exports = {
   crearOperacion,
   obtenerOperacionesPorUsuario,
+  obtenerMemesCompradosPorUsuario,
+  obtenerHistorialOperacionesPorUsuario,
 };

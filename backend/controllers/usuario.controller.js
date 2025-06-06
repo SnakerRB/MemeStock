@@ -54,7 +54,7 @@ exports.getUserData = async (req, res) => {
 
     const operaciones = await Operacion.findAll({
       where: { userId },
-      include: [{ model: Meme }],
+      include: [{ model: Meme, as: "meme" }],
       order: [["createdAt", "ASC"]],
     });
 

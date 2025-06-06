@@ -13,7 +13,7 @@ export const realizarOperacion = async (
     throw new Error("Faltan campos para registrar la operación");
   }
 
-  const res = await fetch("http://localhost:3000/api/operaciones", {
+  const res = await fetch("http://tfc.snakernet.net:3000/api/operaciones", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -37,7 +37,7 @@ export const realizarOperacion = async (
  * Obtiene el historial de operaciones de un usuario desde GET /api/operaciones/:userId
  */
 export const obtenerHistorial = async (userId: string) => {
-  const res = await fetch(`http://localhost:3000/api/operaciones/${userId}`);
+  const res = await fetch(`http://tfc.snakernet.net:3000/api/operaciones/${userId}`);
   if (!res.ok) throw new Error("Error al obtener historial");
   return await res.json(); // Se espera un array de operaciones
 };

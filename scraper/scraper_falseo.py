@@ -55,7 +55,7 @@ def obtener_ultimo_precio(cursor, meme_id):
     return precio
 
 def generar_nuevo_precio(precio_anterior):
-    cambio = random.uniform(-0.05, 0.05)  # +/- 5%
+    cambio = random.uniform(-0.15, 0.25)  # +/- 5%
     nuevo_precio = round(precio_anterior * (1 + cambio), 2)
     return max(nuevo_precio, 0.01)
 

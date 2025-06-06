@@ -15,7 +15,7 @@ const LoginButton = () => {
       };
 
       // Llamada al backend para crear o actualizar el usuario
-      await axios.post("http://localhost:3000/api/user/newuser", userData);
+      await axios.post("http://tfc.snakernet.net:3000/api/user/newuser", userData);
 
     } catch (error) {
       console.error("Error al iniciar sesión:", error);

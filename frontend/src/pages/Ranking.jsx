@@ -28,7 +28,7 @@ const Ranking = () => {
     return `${index + 1}º`;
   };
 
-  const API_BASE_URL = "http://localhost:3000";
+  const API_BASE_URL = "http://tfc.snakernet.net:3000";
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

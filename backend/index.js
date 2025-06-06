@@ -34,8 +34,8 @@ db.sequelize
   .sync({ alter: true }) // actualizar sin borrar datos
   .then(() => {
     console.log("📦 Base de datos conectada y sincronizada correctamente");
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor backend escuchando en http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Servidor backend escuchando en http://0.0.0.0:${PORT}`);
     });
   })
   .catch((error) => {
