@@ -59,16 +59,21 @@ const Cartera = () => {
   };
 
   useEffect(() => {
+    console.log("👜 Cartera actual:", cartera); 
     const fetchData = async () => {
+      if (cartera.length === 0) return;
+
       try {
         const precios = await getMemesSummary();
-        setPreciosActuales(precios);
-
+        console.log("📈 Precios actuales:", precios);
+        
         const historialData: Record<string, MemeHistorial[]> = {};
         for (const meme of cartera) {
           const datos = await getMemeById(meme.id);
           historialData[meme.id] = datos.historial;
         }
+        console.log("📚 Historial completo:", historialData);
+        setPreciosActuales(precios);
         setHistorial(historialData);
       } catch (err) {
         console.error("Error cargando datos:", err);
@@ -77,6 +82,7 @@ const Cartera = () => {
 
     fetchData();
   }, [cartera]);
+
 
   const obtenerPrecioActual = (id: string) => {
     const meme = preciosActuales.find((m) => m.id === id);

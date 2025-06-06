@@ -44,7 +44,12 @@ const Navbar = () => {
 
   return (
     <header className="w-full px-6 py-4 flex justify-between items-center bg-gray-900 shadow-md relative z-50">
-      <Link to="/" className="text-2xl font-bold text-pink-400 tracking-wider">
+      <Link to="/" className="flex items-center gap-3 text-2xl font-bold text-pink-400 tracking-wider">
+        <img
+          src="/logoMS.png"
+          alt="MemeStock Logo"
+          className="w-8 h-8 object-contain" // ajusta el tamaño aquí si quieres más grande o más pequeño
+        />
         MemeStock
       </Link>
 

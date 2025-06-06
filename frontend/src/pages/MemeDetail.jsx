@@ -12,6 +12,16 @@ import {
   CartesianGrid,
 } from "recharts";
 
+const timeRanges = [
+  { label: "Histórico", value: "all" },
+  { label: "Último año", value: "1y" },
+  { label: "Últimos 5 meses", value: "5m" },
+  { label: "Último mes", value: "1m" },
+  { label: "Última semana", value: "1w" },
+  { label: "Últimas 24h", value: "24h" },
+  { label: "Últimas 5h", value: "5h" },
+];
+
 const MemeDetail = () => {
   const { id } = useParams();
   const { comprarMeme } = useUser();
@@ -22,6 +32,8 @@ const MemeDetail = () => {
   const [precioActual, setPrecioActual] = useState(0);
   const [cambio24h, setCambio24h] = useState(0);
   const [volumen24h, setVolumen24h] = useState(0);
+  const [range, setRange] = useState("all");
+  const [cantidad, setCantidad] = useState(1); // 🆕 NUEVO
 
   useEffect(() => {
     const fetchMeme = async () => {
@@ -63,8 +75,8 @@ const MemeDetail = () => {
 
   const handleCompra = async () => {
     if (!meme) return;
-    const exito = await comprarMeme({ ...meme, precio: precioActual });
-    setMensaje(exito ? `✅ Has comprado ${meme.nombre}` : "❌ Saldo insuficiente");
+    const exito = await comprarMeme({ ...meme, precio: precioActual, cantidad }); // 🆕 PASAR cantidad
+    setMensaje(exito ? `✅ Has comprado ${cantidad} ${meme.nombre}` : "❌ Saldo insuficiente");
     setTimeout(() => setMensaje(null), 2000);
   };
 
@@ -76,13 +88,49 @@ const MemeDetail = () => {
   if (loading) return <p className="text-gray-400">Cargando datos del meme...</p>;
   if (!meme) return <p className="text-red-500">❌ Meme no encontrado</p>;
 
-  const historialFormateado = meme.historial.map((entry) => ({
-    ...entry,
-    fecha: new Date(entry.timestamp).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-    }),
-  }));
+  const filtrarHistorial = (historial) => {
+    if (!historial) return [];
+
+    const ahora = new Date();
+    let desdeFecha;
+
+    switch (range) {
+      case "1y":
+        desdeFecha = new Date(ahora.getFullYear() - 1, ahora.getMonth(), ahora.getDate());
+        break;
+      case "5m":
+        desdeFecha = new Date(ahora.getFullYear(), ahora.getMonth() - 5, ahora.getDate());
+        break;
+      case "1m":
+        desdeFecha = new Date(ahora.getFullYear(), ahora.getMonth() - 1, ahora.getDate());
+        break;
+      case "1w":
+        desdeFecha = new Date(ahora.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "24h":
+        desdeFecha = new Date(ahora.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case "5h":
+        desdeFecha = new Date(ahora.getTime() - 5 * 60 * 60 * 1000);
+        break;
+      case "all":
+      default:
+        desdeFecha = null;
+        break;
+    }
+
+    return historial
+      .filter((h) => !desdeFecha || new Date(h.timestamp) >= desdeFecha)
+      .map((entry) => ({
+        ...entry,
+        fecha: new Date(entry.timestamp).toLocaleDateString("es-ES", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+      }));
+  };
+
+  const historialFiltrado = filtrarHistorial(meme.historial);
 
   return (
     <div className="w-full px-4 py-6 space-y-6">
@@ -129,7 +177,15 @@ const MemeDetail = () => {
             ${parseFloat(volumen24h).toLocaleString()}
           </span>
         </div>
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          {/* Selector de cantidad */}
+          <input
+            type="number"
+            min="1"
+            value={cantidad}
+            onChange={(e) => setCantidad(Number(e.target.value))}
+            className="w-20 text-center text-sm rounded-lg px-3 py-1 bg-white/10 text-white border border-white/20 focus:outline-none"
+          />
           <button
             onClick={handleCompra}
             className="bg-pink-500 hover:bg-pink-600 px-6 py-2 rounded font-semibold text-white"
@@ -140,26 +196,47 @@ const MemeDetail = () => {
       </div>
 
       {/* GRÁFICA */}
-      <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-64">
-        <h2 className="text-white text-sm mb-2 font-semibold">Evolución del precio</h2>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={historialFormateado}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-            <XAxis dataKey="fecha" stroke="#ccc" />
-            <YAxis stroke="#ccc" />
-            <Tooltip
-              formatter={(value) => `$${value.toFixed(2)}`}
-              labelStyle={{ color: "#fff" }}
-            />
-            <Line
-              type="monotone"
-              dataKey="precio"
-              stroke="#14b8a6"
-              strokeWidth={2}
-              dot
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-[400px]">
+        <h2 className="text-white text-sm mb-4 font-semibold">Evolución del precio</h2>
+
+        {/* Botones de rango temporal */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {timeRanges.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setRange(opt.value)}
+              className={`px-3 py-1 rounded-full text-sm border ${
+                range === opt.value
+                  ? "bg-pink-500 text-white border-pink-500"
+                  : "bg-gray-800 text-gray-300 border-white/10 hover:bg-gray-700"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Gráfica */}
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={historialFiltrado}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis dataKey="fecha" stroke="#ccc" />
+              <YAxis stroke="#ccc" />
+              <Tooltip
+                formatter={(value) => `$${value.toFixed(2)}`}
+                labelStyle={{ color: "#fff" }}
+              />
+              <Line
+                type="monotone"
+                dataKey="precio"
+                stroke="#14b8a6"
+                strokeWidth={2}
+                dot
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

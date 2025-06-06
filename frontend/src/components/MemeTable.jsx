@@ -13,24 +13,8 @@ const MemeTable = () => {
   useEffect(() => {
     const cargarMemes = async () => {
       try {
-        const [memesBase, resumenResponse] = await Promise.all([
-          getMemes(), // 👈 Tu endpoint que da historial
-          fetch("http://tfc.snakernet.net:3000/api/meme/GetMemesSummary").then((res) =>
-            res.json()
-          ), // 👈 Endpoint nuevo que da cambio24h y volumen24h
-        ]);
-
-        // Cruzar ambos resultados por ID
-        const memesCombinados = memesBase.map((meme) => {
-          const resumen = resumenResponse.find((r) => r.id === meme.id);
-          return {
-            ...meme,
-            cambio24h: resumen ? resumen.cambio24h : null, // si no hay, null
-            volumen24h: resumen ? resumen.volumen24h : null,
-          };
-        });
-
-        setMemes(memesCombinados);
+        const data = await getMemes();
+        setMemes(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -95,7 +79,6 @@ const MemeTable = () => {
               <th className="px-4 py-3">Meme</th>
               <th className="px-4 py-3">Precio</th>
               <th className="px-4 py-3">Última actualización</th>
-              <th className="px-4 py-3">Cambio 24h</th>
               <th className="px-4 py-3">Rareza</th>
               <th className="px-4 py-3">Acciones</th>
             </tr>
@@ -103,7 +86,7 @@ const MemeTable = () => {
           <tbody>
             {memes.map((meme, index) => {
               const cambioCalculado = calcularCambio(meme.historial);
-              const isPositive = meme.cambio24h >= 0;
+              const isPositive = cambioCalculado >= 0;
 
               return (
                 <tr
@@ -132,13 +115,6 @@ const MemeTable = () => {
                     {meme.precioTimestamp
                       ? dateFormatter(meme.precioTimestamp)
                       : "Sin datos"}
-                  </td>
-                  <td
-                    className={`px-4 py-3 font-semibold ${
-                      isPositive ? "text-green-400" : "text-red-400"
-                    }`}
-                  >
-                    {meme.cambio24h != null ? `${meme.cambio24h.toFixed(2)}%` : "--"}
                   </td>
                   <td className="px-4 py-3 capitalize text-pink-300">{meme.rareza}</td>
                   <td className="px-4 py-3">

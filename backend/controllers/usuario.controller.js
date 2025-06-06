@@ -54,14 +54,14 @@ exports.getUserData = async (req, res) => {
 
     const operaciones = await Operacion.findAll({
       where: { userId },
-      include: [{ model: Meme, as: "meme" }],
+      include: [{ model: Meme, as: "meme" }], // 👈 alias correcto
       order: [["createdAt", "ASC"]],
     });
 
     const carteraMap = new Map();
 
     for (const op of operaciones) {
-      const meme = op.Meme;
+      const meme = op.meme; // 👈 👈 👈 Cambiado de `op.Meme` a `op.meme`
       if (!meme) continue;
 
       const key = meme.id;
